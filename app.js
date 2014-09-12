@@ -9,13 +9,16 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var expressLayouts = require('express-ejs-layouts');
 
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('layout', 'main_layout');
+app.use(expressLayouts);
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(favicon());
 app.use(logger('dev'));
