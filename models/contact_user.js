@@ -8,7 +8,7 @@ var ContactUserSchema = new Schema({
 	user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
 	firstName: String,
 	lastName: String,
-	emailAddress: String, //not validated because its not important really
+	emailAddress: String //not validated because its not important really
 });
 
 ContactUserSchema.plugin(uniqueValidator);
