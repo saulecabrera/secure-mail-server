@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>secure mail server</title>
+		<title><%- titleholder %></title>
 		 <link rel='stylesheet' href='/stylesheets/style.css' />
+		 <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
-		<%-content %>
+		<div class="header-wrapper">
+			<%-headercontent %>
+		</div>
+		<div class="content-wrapper">
+			<%-content %>
+		</div>
 	</body>
 </html>
