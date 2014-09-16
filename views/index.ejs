@@ -1,5 +1,29 @@
 <%- contentFor('titleholder') %>
-secure mail server
-<%- contentFor('headercontent') %>
-<%- contentFor('content') %>
+<%= title %>
 
+<%- contentFor('headercontent') %>
+<div class="jumbotron">
+	<h1>SECURE MAIL SERVER</h1>
+	<p>SECURE MAIL SERVER ensures the integrity and security of your mails via MD5 and 3DES. It uses your Twitter username to create your email address.</p>
+</div>
+
+<%- contentFor('content') %>
+<div class="row">
+	<div class="col-md-4">
+	</div>
+	<div class="col-md-4">
+		<center>
+		<% if (!user) { %>
+			<a href="/auth/twitter" class="btn btn-default btn-lg" role="button">
+				Twitter Sign In
+			</a>
+		<% } else { %>
+			<a href="/logout" class="btn btn-default btn-lg" role="button">
+				Logout <%= user.name %>
+			</a>
+		<% } %>
+		</center>
+	</div>
+	<div class="col-md-4">
+	</div>
+</div>

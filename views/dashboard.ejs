@@ -1,0 +1,68 @@
+<%- contentFor('titleholder') %>
+<%= title %>
+
+<%- contentFor('headercontent') %>
+<div class="page-header">
+	<h1>Dashboard</h1>
+</div>
+
+<%- contentFor('content') %>
+<div class="row">
+	<div class="col-md-12">
+		<center>
+			<ul class="nav nav-tabs nav-justified" role="tablist">
+				<li class="active"><a href="#newmail" data-toggle="tab">Compose Email</a></li>
+				<li><a href="#inbox" data-toggle="tab">Inbox</a></li>
+				<li><a href="#outbox" data-toggle="tab">Outbox</a></li>
+				<li><a href="#contacts" data-toggle="tab">Contacts</a></li>
+				<li><a href="#serverinfo" data-toggle="tab">Server Information</a></li>
+			</ul>
+		</center>
+			<div class="tab-content">
+				<div class="tab-pane active" id="newmail">
+					<div class="row" id="todiv">
+						<div class="col-md-1">
+						</div>
+						<div class="col-md-1">
+							To
+						</div>
+						<div class="col-md-10">
+							<input type="text" class="form-control" placeholder="Comma (,) separated email addresses" name="to">
+						</div>
+					</div>
+					<div class="row" id="subjectdiv">
+						<div class="col-md-1">
+						</div>
+						<div class="col-md-1">
+							Subject
+						</div>
+						<div class="col-md-10">
+							<input type="text" class="form-control" placeholder="Subject" name="subject">
+						</div>
+					</div>
+					<div class="row" id="msgbodydiv">
+						<div class="col-md-2"></div>
+						<div class="col-md-10">
+							<textarea class="form-control">
+							</textarea>
+						</div>
+					</div>
+					<div class="row" id="btndiv">
+						<div class="col-md-2">
+						</div>
+						<div class="col-md-10">
+							<button type="button" class="btn btn-default">Send</button>	
+						</div>
+					</div>
+				</div>
+  				<div class="tab-pane" id="inbox">
+  				</div>
+  				<div class="tab-pane" id="outbox">
+  				</div>
+  				<div class="tab-pane" id="contacts">
+  				</div>
+  				<div class="tab-pane" id="serverinfo">
+  				</div>
+			</div>
+	</div>
+</div>

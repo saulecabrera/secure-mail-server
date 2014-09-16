@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><%- titleholder %></title>
-		 <link rel='stylesheet' href='/stylesheets/style.css' />
+		<title><%-titleholder %></title>
+		 <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 		 <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+		 <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+		 <link rel='stylesheet' href='/stylesheets/style.css' />
+		 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	</head>
 	<body>
-		<div class="header-wrapper">
-			<%-headercontent %>
-		</div>
-		<div class="content-wrapper">
-			<%-content %>
+		<div class="container">
+			<div class="header-wrapper">
+				<%-headercontent %>
+			</div>
+			<div class="content-wrapper">
+				<%-content %>
+			</div>
 		</div>
 	</body>
+	<script type="text/javascript">
+		var socket = io();
+		$(document).ready(function() {
+			$('#btndiv button').click(function() {
+				if ($('#todiv input').val() != '') {
+					var email = {};
+					email.receivers = $('#todiv input').val().split(',');
+					email.subject = $('#subjectdiv input').val();
+					email.body = $('#msgbodydiv textarea').val().trim();
+					socket.emit('new email', JSON.stringify(email));
+				}	
+			});
+		});
+	</script>
 </html>

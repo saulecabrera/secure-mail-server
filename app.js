@@ -1,4 +1,3 @@
-
 var express = require('express');
 var path = require('path');
 var http = require('http');
@@ -6,6 +5,10 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var passport =  require('passport');
+var session = require('express-session');
+var params = require('express-params');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -13,22 +16,30 @@ var expressLayouts = require('express-ejs-layouts');
 
 
 var app = express();
+params.extend(app);
 
 // view engine setup
 app.set('view engine', 'ejs');
 app.set('layout', 'main_layout');
-app.use(expressLayouts);
 app.set('views', path.join(__dirname, 'views'));
+app.use(expressLayouts);
 
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
+app.use(session({ secret: 'valbikcipauuaxfstyltxumlehtlljqtwpcgfulqelzhvdulpn', resave: true, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/u', users);
+
+mongoose.connect('mongodb://localhost/secure-mail-server-v2');
+
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
