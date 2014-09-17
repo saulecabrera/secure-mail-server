@@ -20,7 +20,6 @@ router.get('/auth/twitter/callback',
 		failureRedirect: '/'
 	}),
 	function(req, res) {
-		console.log(req.user);
 		res.redirect('/u/' + req.user.emailAddress.split('@')[0] + '/dashboard');
 	}
 );
