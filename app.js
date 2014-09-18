@@ -6,7 +6,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var passport =  require('passport');
+var passport = require('passport');
 var session = require('express-session');
 var params = require('express-params');
 var MongooseSession = require('mongoose-session')(mongoose);
@@ -17,7 +17,7 @@ var users = require('./routes/users');
 var expressLayouts = require('express-ejs-layouts');
 var passportSocketIo = require('passport.socketio');
 
-
+var nodemailer = require('nodemailer');
 var MailObject = require('./models/mail_object');
 
 var app = express();
@@ -44,7 +44,7 @@ app.use(session({
     secret: 'valbikcipauuaxfstyltxumlehtlljqtwpcgfulqelzhvdulpn',
     resave: true,
     saveUninitialized: true,
-    store: MongooseSession 
+    store: MongooseSession
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -63,31 +63,91 @@ io.use(passportSocketIo.authorize({
     fail: onAuthorizeFail
 }));
 
-function onAuthorizeSuccess(data, accept){
+function onAuthorizeSuccess(data, accept) {
     accept();
 }
 
-function onAuthorizeFail(data, message, error, accept){
-    if(error)
+function onAuthorizeFail(data, message, error, accept) {
+    if (error)
         accept(new Error(message));
 }
 
-io.on('connection', function(socket){
-    socket.on('new email', function(email){
-        var parsed = JSON.parse(email);
-        //verifiy receivers email address ending and classify where to send
-        var mailObject = new MailObject();
-        mailObject.subject = parsed.subject;
-        mailObject.body = parsed.body;
-        mailObject.sender = socket.request.user._id;
-        mailObject.receiver = parsed.receivers[0];
-        mailObject.save(function(err){
-            if(err){
-                throw err;
-            }
-        })
+//socket handling
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'scabrera92@unitec.edu',
+        pass: 'Tilica1984'
+    }
+});
+
+var onlineUsers = 0;
+io.on('connection', function(socket) {
+
+    onlineUsers++;
+
+    var connectionInfo = {};
+    connectionInfo.connectedUsers = onlineUsers;
+    connectionInfo.user = {};
+    connectionInfo.user.name = socket.request.user.name;
+    connectionInfo.user.email = socket.request.user.emailAddress;
+
+    /*
+        encrypt
+        send
+    */
+
+
+    io.sockets.emit('login', JSON.stringify(connectionInfo));
+
+    socket.on('disconnect', function(){
+        onlineUsers--;
+        connectionInfo.connectedUsers = onlineUsers;
+        io.sockets.emit('logout', JSON.stringify(connectionInfo));
     });
-})
+
+    socket.on('new email', function(email) {
+            /*
+                decryption
+                db insert and associated relations
+                send email to third parties
+                encrypt
+                send
+            */
+
+        var parsedEmail = JSON.parse(email);
+        for (var i = 0; i < parsedEmail.receivers.length; i++) {
+            var mailObject = new MailObject();
+            mailObject.subject = parsedEmail.subject;
+            mailObject.sender = socket.request.user._id;
+            mailObject.receiver = parsedEmail.receivers[i];
+            mailObject.body = parsedEmail.body;
+
+            if (mailObject.receiver.split('@')[1] != 'sms.com') {
+                var mailOptions = {
+                    from: 'Saúl Cabrera ✔ <scabrera92@unitec.edu>',
+                    to: mailObject.receiver,
+                    subject: mailObject.subject,
+                    text: mailObject.body
+                }
+                transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Message sent ' + info.response);
+                    }
+                });
+            }
+
+            mailObject.save(function(err) {
+                if (err) {
+                    throw err;
+                }
+            });
+        }
+    });
+
+});
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -123,7 +183,7 @@ app.use(function(err, req, res, next) {
 app.set('port', process.env.PORT || 3000);
 
 server.listen(app.get('port'), function() {
-  debug('Express server listening on port ' + app.get('port'));
+    debug('Express server listening on port ' + app.get('port'));
 });
 
 module.exports = app;
