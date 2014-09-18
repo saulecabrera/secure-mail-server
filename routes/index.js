@@ -13,6 +13,7 @@ router.get('/', function(req, res) {
 	});
 });
 
+//this comment is to check sinc
 router.get('/auth/twitter', passport.authenticate('twitter'));
 
 router.get('/auth/twitter/callback',
@@ -32,7 +33,7 @@ router.get('/logout', function(req, res) {
 passport.use(new TwitterStrategy({
 		consumerKey: "v5e467m9Nk9Uo8fv4Xaezw",
 		consumerSecret: "jlCnhwBRIsPYLyy7qZLx1ePPm7E3Zv5vq2MIB2fw",
-		callbackURL: "http://localhost:3000/auth/twitter/callback"
+		callbackURL: "http://secure-mail-server-147127.use1.nitrousbox.com/auth/twitter/callback"
 	},
 	function(token, tokenSecret, profile, done) {
 		User.findOne({
