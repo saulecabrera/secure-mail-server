@@ -8,7 +8,8 @@
 		 <link rel='stylesheet' href='/stylesheets/style.css' />
 		 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-		 <script src="/node_modules/node-forge/js/forge.js"></script>
+		 <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+		 <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/tripledes.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -23,6 +24,20 @@
 	<script type="text/javascript">
 		var socket = io();
 		$(document).ready(function() {
+
+			/*var msg = "Hola";
+			var tripleDesKey = CryptoJS.MD5(msg).toString();
+			console.log("md5: " + tripleDesKey);
+
+			var tripleDesEncryption = CryptoJS.TripleDES.encrypt(msg, tripleDesKey).toString();
+			console.log("3des encryption: " + tripleDesEncryption);
+
+			var decryption = CryptoJS.TripleDES.decrypt(tripleDesEncryption, tripleDesKey).toString(CryptoJS.enc.Latin1);
+			console.log("3des decryption: " + decryption);*/
+
+			/*
+				Sending a new mail
+			*/
 			$('#btndiv button').click(function() {
 				if ($('#todiv input').val() != '') {
 					var email = {};
@@ -31,7 +46,42 @@
 					email.body = $('#msgbodydiv textarea').val().trim();
 					socket.emit('new email', JSON.stringify(email));
 				}
+				$('#todiv input').val('');
+				$('#subjectdiv input').val('');
+				$('#msgbodydiv textarea').val('')
 			});
+
+			/*
+				Displaying users connected to the server
+			*/
+
+			socket.on('login', function(userData){
+				var parsed = JSON.parse(userData);
+				$('#connected .panel.panel-default .panel-heading').text('');
+				$('#connected .panel.panel-default .panel-heading').text(
+					parsed.connectedUsers + ' online users'
+				);
+
+				$('#connected .panel.panel-default table.table').append(
+					'<tr>' +
+						'<td>' + parsed.user.name + '</td>' +
+						'<td>' + parsed.user.email + '</td>' +
+					'</tr>'
+				);
+			});
+
+
+			socket.on('logout', function(userData){
+				var parsed = JSON.parse(userData);
+				$('#connected .panel.panel-default .panel-heading').text('');
+				$('#connected .panel.panel-default .panel-heading').text(
+					parsed.connectedUsers + ' online users'
+				);
+				$('#connected .panel.panel-default table.table tr').each(function(){
+					console.log($(this).text());
+				});
+			});
+
 		});
 	</script>
 </html>
