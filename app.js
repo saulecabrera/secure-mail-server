@@ -11,7 +11,7 @@ var session = require('express-session');
 var params = require('express-params');
 var MongooseSession = require('mongoose-session')(mongoose);
 var debug = require('debug')('secure-mail-server');
-var _ = require ('underscore');
+var _ = require('underscore');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -87,49 +87,61 @@ var liveConnections = new Array();
 io.on('connection', function(socket) {
 
     onlineUsers++;
-    if(_.find(liveConnections, function(conn){ return conn.sessionId == socket.client.request.sessionID; }) === undefined){
-      liveConnections.push({
-        userName: socket.request.user.name,
-        userEmailAddress: socket.request.user.emailAddress,
-        sessionId: socket.client.request.sessionID
-      }); 
+    if (_.find(liveConnections, function(conn) {
+        return conn.sessionId == socket.client.request.sessionID;
+    }) === undefined) {
+        liveConnections.push({
+            userName: socket.request.user.name,
+            userEmailAddress: socket.request.user.emailAddress,
+            sessionId: socket.client.request.sessionID
+        });
     }
     /*
         encrypt
         send
     */
 
-    io.sockets.emit('login', JSON.stringify({liveConnections: liveConnections, onlineUsersCount: onlineUsers}));
+    io.sockets.emit('login', JSON.stringify({
+        liveConnections: liveConnections,
+        onlineUsersCount: onlineUsers
+    }));
 
-    socket.on('disconnect', function(){
-      onlineUsers--;
-      var found = _.find(liveConnections, function(conn){
-        return conn.userEmailAddress == socket.request.user.emailAddress;
-      });
-     
-      var index = liveConnections.indexOf(found)
-      liveConnections.splice(index, 1);
-      io.sockets.emit('logout', JSON.stringify({liveConnections: liveConnections, onlineUsersCount: onlineUsers}));
+    socket.on('disconnect', function() {
+        onlineUsers--;
+        var found = _.find(liveConnections, function(conn) {
+            return conn.userEmailAddress == socket.request.user.emailAddress;
+        });
+
+        var index = liveConnections.indexOf(found)
+        liveConnections.splice(index, 1);
+        io.sockets.emit('logout', JSON.stringify({
+            liveConnections: liveConnections,
+            onlineUsersCount: onlineUsers
+        }));
     });
-    
+
     var mailServer = {};
     mailServer.inbox = [];
     mailServer.outbox = [];
     MailObject
-      .find({receiver: socket.request.user.emailAddress})
-      .populate('sender')
-      .exec(function(err, m){
+        .find({
+            receiver: socket.request.user.emailAddress
+        })
+        .populate('sender')
+        .exec(function(err, m) {
+            if (err) return handleError(err);
+            mailServer.inbox = m;
+            socket.emit('populate inbox', JSON.stringify(mailServer));
+        });
+    MailObject.find({
+        sender: socket.request.user._id
+    }, function(err, m) {
         if (err) return handleError(err);
-        mailServer.inbox = m;
-        socket.emit('populate inbox', JSON.stringify(mailServer));
-      });
-    MailObject.find({sender: socket.request.user._id}, function(err, m){
-      if(err) return handleError(err);
-      mailServer.outbox = m;
-      socket.emit('populate outbox', JSON.stringify(mailServer));
+        mailServer.outbox = m;
+        socket.emit('populate outbox', JSON.stringify(mailServer));
     });
     socket.on('new email', function(email) {
-            /*
+        /*
                 decryption
                 db insert and associated relations
                 send email to third parties
@@ -158,7 +170,7 @@ io.on('connection', function(socket) {
                     } else {
                         console.log('Message sent ' + info.response);
                     }
-                });  
+                });
             }
 
             mailObject.save(function(err) {
@@ -173,20 +185,24 @@ io.on('connection', function(socket) {
         mailServer.inbox = [];
         mailServer.outbox = [];
         MailObject
-          .find({receiver: socket.request.user.emailAddress})
-          .populate('sender')
-          .exec(function(err, m){
+            .find({
+                receiver: socket.request.user.emailAddress
+            })
+            .populate('sender')
+            .exec(function(err, m) {
+                if (err) return handleError(err);
+                mailServer.inbox = m;
+                socket.emit('populate inbox', JSON.stringify(mailServer));
+            });
+        MailObject.find({
+            sender: socket.request.user._id
+        }, function(err, m) {
             if (err) return handleError(err);
-            mailServer.inbox = m;
-            socket.emit('populate inbox', JSON.stringify(mailServer));
-          });
-        MailObject.find({sender: socket.request.user._id}, function(err, m){
-          if(err) return handleError(err);
-          mailServer.outbox = m;
-          socket.emit('populate outbox', JSON.stringify(mailServer));
+            mailServer.outbox = m;
+            socket.emit('populate outbox', JSON.stringify(mailServer));
         });
-      }); //socket on new mail
-  });
+    }); //socket on new mail
+});
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
