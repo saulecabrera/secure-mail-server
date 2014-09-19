@@ -120,34 +120,38 @@ io.on('connection', function(socket) {
         }));
     });
 
+    /* just for populating when user connects */
     var mailServer = {};
     mailServer.inbox = [];
     mailServer.outbox = [];
     MailObject
-        .find({
-            receiver: socket.request.user.emailAddress
-        })
+        .find().or([{receiver: socket.request.user.emailAddress}, {sender: socket.request.user._id}])
         .populate('sender')
         .exec(function(err, m) {
             if (err) return handleError(err);
-            mailServer.inbox = m;
-            socket.emit('populate inbox', JSON.stringify(mailServer));
+
+            mailServer.inbox = _.filter(m, function(mx) {
+                return mx.receiver == socket.request.user.emailAddress;
+            });
+
+            mailServer.outbox = _.filter(m, function(mx) {
+                return mx.sender.emailAddress == socket.request.user.emailAddress;
+            });
+
+            mailServer.inbox.reverse();
+            mailServer.outbox.reverse();
+
+            io.sockets.connected[socket.id].emit('new email', JSON.stringify(mailServer));
         });
-    MailObject.find({
-        sender: socket.request.user._id
-    }, function(err, m) {
-        if (err) return handleError(err);
-        mailServer.outbox = m;
-        socket.emit('populate outbox', JSON.stringify(mailServer));
-    });
+
     socket.on('new email', function(email) {
         /*
-                decryption
-                db insert and associated relations
-                send email to third parties
-                encrypt
-                send
-            */
+            decryption
+            db insert and associated relations
+            send email to third parties
+            encrypt
+            send
+        */
 
         var parsedEmail = JSON.parse(email);
         for (var i = 0; i < parsedEmail.receivers.length; i++) {
@@ -177,31 +181,30 @@ io.on('connection', function(socket) {
                 if (err) {
                     throw err;
                 }
+                mailServer = {};
+                mailServer.inbox = [];
+                mailServer.outbox = [];
+                MailObject
+                    .find().or([{receiver: socket.request.user.emailAddress}, {sender: socket.request.user._id}])
+                    .populate('sender')
+                    .exec(function(err, m) {
+                        if (err) return handleError(err);
+                        mailServer.inbox = _.filter(m, function(mx) {
+                            return mx.receiver == socket.request.user.emailAddress;
+                        });
+
+                        mailServer.outbox = _.filter(m, function(mx) {
+                            return mx.sender.emailAddress == socket.request.user.emailAddress;
+                        });
+
+                        mailServer.inbox.reverse();
+                        mailServer.outbox.reverse();
+
+                        io.sockets.connected[socket.id].emit('new email', JSON.stringify(mailServer));
+                    });
             });
         }
-        //filteriing mails for front-end
-        //send object with in and out classified
-        var mailServer = {};
-        mailServer.inbox = [];
-        mailServer.outbox = [];
-        MailObject
-            .find({
-                receiver: socket.request.user.emailAddress
-            })
-            .populate('sender')
-            .exec(function(err, m) {
-                if (err) return handleError(err);
-                mailServer.inbox = m;
-                socket.emit('populate inbox', JSON.stringify(mailServer));
-            });
-        MailObject.find({
-            sender: socket.request.user._id
-        }, function(err, m) {
-            if (err) return handleError(err);
-            mailServer.outbox = m;
-            socket.emit('populate outbox', JSON.stringify(mailServer));
-        });
-    }); //socket on new mail
+    }); 
 });
 
 /// catch 404 and forward to error handler

@@ -38,3 +38,7 @@ html, body{
 #inbox-view{
   margin-top: 2.5%;
 }
+
+#outbox-view{
+	margin-top: 2.5%;
+}

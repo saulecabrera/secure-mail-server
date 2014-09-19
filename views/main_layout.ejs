@@ -62,9 +62,9 @@
 					parsedConnections.onlineUsersCount + ' users online'
 				);
           
-                $('#connected .panel.panel-default table.table tr').remove();
+                $('#connected .panel.panel-default table.table tbody tr').remove();
                 for(var i = 0; i < parsedConnections.liveConnections.length; i++){
-                    $('#connected .panel.panel-default table.table').append(
+                    $('#connected .panel.panel-default table.table tbody').append(
 					     '<tr>' +
 						      '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
 						      '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
@@ -81,9 +81,9 @@
 					parsedConnections.onlineUsersCount + ' users online'
 				);
         
-                $('#connected .panel.panel-default table.table tr').remove();
+                $('#connected .panel.panel-default table.table tbody tr').remove();
                 for(var i = 0; i < parsedConnections.liveConnections.length; i++){
-                    $('#connected .panel.panel-default table.table').append(
+                    $('#connected .panel.panel-default table.table tbody').append(
 					    '<tr>' +
 						    '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
 						    '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
@@ -92,11 +92,12 @@
                 }
 		    });
             //inbox outbox population
-            socket.on('populate inbox', function(mServer){
+            socket.on('new email', function(mServer){
                 parsedMailServer = JSON.parse(mServer);
-                $('#inbox-view #mails .panel.panel-default table.table tr').remove();
+                console.log(parsedMailServer.inbox.length);
+                $('#inbox-view #mails .panel.panel-default table.table tbody tr').remove();
                 for(var i = 0; i < parsedMailServer.inbox.length; i++){
-                    $('#inbox-view #mails .panel.panel-default table.table').append(
+                    $('#inbox-view #mails .panel.panel-default table.table tbody').append(
                         '<tr>' +
 						    '<td>' + parsedMailServer.inbox[i].sender.emailAddress + '</td>' +
                             '<td>' + parsedMailServer.inbox[i].subject + '</td>' +
@@ -105,10 +106,17 @@
 					    '</tr>'
                     );
                 }
-            });
-      
-            socket.on('populate outbox', function(mServer){
-                parsedMailServer = JSON.parse(mServer);
+                $('#outbox-view #mails .panel.panel-default table.table tbody tr').remove();
+                for(var i = 0; i < parsedMailServer.outbox.length; i++){
+                    $('#outbox-view #mails .panel.panel-default table.table tbody').append(
+                        '<tr>' +
+						    '<td>' + parsedMailServer.outbox[i].receiver + '</td>' +
+                            '<td>' + parsedMailServer.outbox[i].subject + '</td>' +
+						    '<td>' + parsedMailServer.outbox[i].body + '</td>' +
+                            '<td>' + parsedMailServer.outbox[i].createdAt + '</td>' +
+					    '</tr>'
+                    );
+                }
             });
         });
 	</script>

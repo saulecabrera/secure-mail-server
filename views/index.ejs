@@ -21,6 +21,9 @@
 			<a href="/logout" class="btn btn-default btn-lg" role="button">
 				Logout <%= user.name %>
 			</a>
+			<a style="margin-top: 1%;" href="/u/<%= user.emailAddress.split('@')[0] %>/dashboard" class="btn btn-default btn-lg" role="button">
+				Get to dashboard <%= user.name %>
+			</a>
 		<% } %>
 		</center>
 	</div>
