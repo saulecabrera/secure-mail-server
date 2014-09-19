@@ -62,18 +62,18 @@
 					parsedConnections.onlineUsersCount + ' users online'
 				);
           
-        $('#connected .panel.panel-default table.table tr').remove();
-        for(var i = 0; i < parsedConnections.liveConnections.length; i++){
-          $('#connected .panel.panel-default table.table').append(
-					  '<tr>' +
-						  '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
-						  '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
-					  '</tr>'
-				  ); 
-        }
+                $('#connected .panel.panel-default table.table tr').remove();
+                for(var i = 0; i < parsedConnections.liveConnections.length; i++){
+                    $('#connected .panel.panel-default table.table').append(
+					     '<tr>' +
+						      '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
+						      '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
+					      '</tr>'
+				    ); 
+                }
 			});
 
-      //updating connected users
+            //updating connected users
 			socket.on('logout', function(connections){
 				var parsedConnections = JSON.parse(connections);
 				$('#connected .panel.panel-default .panel-heading').text('');
@@ -81,36 +81,35 @@
 					parsedConnections.onlineUsersCount + ' users online'
 				);
         
-        $('#connected .panel.panel-default table.table tr').remove();
-        for(var i = 0; i < parsedConnections.liveConnections.length; i++){
-          $('#connected .panel.panel-default table.table').append(
-					  '<tr>' +
-						  '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
-						  '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
-					  '</tr>'
-				  ); 
-        }
-		  });
-      //inbox outbox population
-      socket.on('populate inbox', function(mServer){
-        parsedMailServer = JSON.parse(mServer);
-        $('#inbox-view #mails .panel.panel-default table.table tr').remove();
-        console.log(parsedMailServer);
-        for(var i = 0; i < parsedMailServer.inbox.length; i++){
-          $('#inbox-view #mails .panel.panel-default table.table').append(
-            '<tr>' +
-						  '<td>' + parsedMailServer.inbox[i].sender.emailAddress + '</td>' +
-              '<td>' + parsedMailServer.inbox[i].subject + '</td>' +
-						  '<td>' + parsedMailServer.inbox[i].body + '</td>' +
-              '<td>' + parsedMailServer.inbox[i].createdAt + '</td>' +
-					  '</tr>'
-           );
-        }
-      });
+                $('#connected .panel.panel-default table.table tr').remove();
+                for(var i = 0; i < parsedConnections.liveConnections.length; i++){
+                    $('#connected .panel.panel-default table.table').append(
+					    '<tr>' +
+						    '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
+						    '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
+					    '</tr>'
+				    ); 
+                }
+		    });
+            //inbox outbox population
+            socket.on('populate inbox', function(mServer){
+                parsedMailServer = JSON.parse(mServer);
+                $('#inbox-view #mails .panel.panel-default table.table tr').remove();
+                for(var i = 0; i < parsedMailServer.inbox.length; i++){
+                    $('#inbox-view #mails .panel.panel-default table.table').append(
+                        '<tr>' +
+						    '<td>' + parsedMailServer.inbox[i].sender.emailAddress + '</td>' +
+                            '<td>' + parsedMailServer.inbox[i].subject + '</td>' +
+						    '<td>' + parsedMailServer.inbox[i].body + '</td>' +
+                            '<td>' + parsedMailServer.inbox[i].createdAt + '</td>' +
+					    '</tr>'
+                    );
+                }
+            });
       
-      socket.on('populate outbox', function(mServer){
-        parsedMailServer = JSON.parse(mServer);
-      });
-    });
+            socket.on('populate outbox', function(mServer){
+                parsedMailServer = JSON.parse(mServer);
+            });
+        });
 	</script>
 </html>
