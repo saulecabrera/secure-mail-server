@@ -32,6 +32,7 @@
     "socket.io": "^1.1.0",
     "static-favicon": "~1.0.0",
     "express-ejs-layouts": "^1.1.0",
-    "passport.socketio": "^3.3.0"
+    "passport.socketio": "^3.3.0",
+    "underscore": "^1.7.0"
   }
 }

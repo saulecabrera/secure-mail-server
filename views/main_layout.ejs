@@ -55,33 +55,42 @@
 				Displaying users connected to the server
 			*/
 
-			socket.on('login', function(userData){
-				var parsed = JSON.parse(userData);
+			socket.on('login', function(connections){
+				var parsedConnections = JSON.parse(connections);
 				$('#connected .panel.panel-default .panel-heading').text('');
 				$('#connected .panel.panel-default .panel-heading').text(
-					parsed.connectedUsers + ' online users'
+					parsedConnections.onlineUsersCount + ' users online'
 				);
-
-				$('#connected .panel.panel-default table.table').append(
-					'<tr>' +
-						'<td>' + parsed.user.name + '</td>' +
-						'<td>' + parsed.user.email + '</td>' +
-					'</tr>'
-				);
+          
+        $('#connected .panel.panel-default table.table tr').remove();
+        for(var i = 0; i < parsedConnections.liveConnections.length; i++){
+          $('#connected .panel.panel-default table.table').append(
+					  '<tr>' +
+						  '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
+						  '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
+					  '</tr>'
+				  ); 
+        }
 			});
 
 
-			socket.on('logout', function(userData){
-				var parsed = JSON.parse(userData);
+			socket.on('logout', function(connections){
+				var parsedConnections = JSON.parse(connections);
 				$('#connected .panel.panel-default .panel-heading').text('');
 				$('#connected .panel.panel-default .panel-heading').text(
-					parsed.connectedUsers + ' online users'
+					parsedConnections.onlineUsersCount + ' users online'
 				);
-				$('#connected .panel.panel-default table.table tr').each(function(){
-					console.log($(this).text());
-				});
-			});
-
-		});
+        
+        $('#connected .panel.panel-default table.table tr').remove();
+        for(var i = 0; i < parsedConnections.liveConnections.length; i++){
+          $('#connected .panel.panel-default table.table').append(
+					  '<tr>' +
+						  '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
+						  '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
+					  '</tr>'
+				  ); 
+        }
+		  });
+    });
 	</script>
 </html>

@@ -11,6 +11,7 @@ var session = require('express-session');
 var params = require('express-params');
 var MongooseSession = require('mongoose-session')(mongoose);
 var debug = require('debug')('secure-mail-server');
+var _ = require ('underscore');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -82,28 +83,34 @@ var transporter = nodemailer.createTransport({
 });
 
 var onlineUsers = 0;
+var liveConnections = new Array();
 io.on('connection', function(socket) {
 
     onlineUsers++;
-
-    var connectionInfo = {};
-    connectionInfo.connectedUsers = onlineUsers;
-    connectionInfo.user = {};
-    connectionInfo.user.name = socket.request.user.name;
-    connectionInfo.user.email = socket.request.user.emailAddress;
-
+    if(_.find(liveConnections, function(conn){ return conn.sessionId == socket.client.request.sessionID; }) === undefined){
+      liveConnections.push({
+        userName: socket.request.user.name,
+        userEmailAddress: socket.request.user.emailAddress,
+        sessionId: socket.client.request.sessionID
+      }); 
+      console.log(liveConnections);
+    }
     /*
         encrypt
         send
     */
 
-
-    io.sockets.emit('login', JSON.stringify(connectionInfo));
+    io.sockets.emit('login', JSON.stringify({liveConnections: liveConnections, onlineUsersCount: onlineUsers}));
 
     socket.on('disconnect', function(){
-        onlineUsers--;
-        connectionInfo.connectedUsers = onlineUsers;
-        io.sockets.emit('logout', JSON.stringify(connectionInfo));
+      onlineUsers--;
+      var found = _.find(liveConnections, function(conn){
+        return conn.userEmailAddress == socket.request.user.emailAddress;
+      });
+     
+      var index = liveConnections.indexOf(found)
+      liveConnections.splice(index, 1);
+      io.sockets.emit('logout', JSON.stringify({liveConnections: liveConnections, onlineUsersCount: onlineUsers}));
     });
 
     socket.on('new email', function(email) {
