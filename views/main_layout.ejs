@@ -23,6 +23,7 @@
 	</body>
 	<script type="text/javascript">
 		var socket = io();
+		var HK = CryptoJS.MD5('valbikcipauuaxfstyltxumlehtlljqtwpcgfulqelzhvdulpn').toString();
 		$(document).ready(function() {
 
 			/*var msg = "Hola";
@@ -38,33 +39,38 @@
 			/*
 				Sending a new mail
 			*/
+
 			$('#btndiv button').click(function() {
 				if ($('#todiv input').val() != '') {
 					var email = {};
+					var JSONString = "";
 					email.receivers = $('#todiv input').val().split(',');
 					email.subject = $('#subjectdiv input').val();
 					email.body = $('#msgbodydiv textarea').val().trim();
-					socket.emit('new email', JSON.stringify(email));
+					JSONString = JSON.stringify(email);
+					var des = CryptoJS.TripleDES.encrypt(JSONString, HK).toString();
+					socket.emit('new email', des);
 				}
 				$('#todiv input').val('');
 				$('#subjectdiv input').val('');
 				$('#msgbodydiv textarea').val('')
 			});
-
 			/*
 				Displaying users connected to the server
 			*/
 
 			socket.on('login', function(connections){
-				var parsedConnections = JSON.parse(connections);
-				$('#connected .panel.panel-default .panel-heading').text('');
-				$('#connected .panel.panel-default .panel-heading').text(
+
+				var decryption = CryptoJS.TripleDES.decrypt(connections, HK).toString(CryptoJS.enc.Latin1);
+				var parsedConnections = JSON.parse(decryption);
+				$('#view-server-info #connected .panel.panel-default .panel-heading').text('');
+				$('#view-server-info #connected .panel.panel-default .panel-heading').text(
 					parsedConnections.onlineUsersCount + ' users online'
 				);
           
-                $('#connected .panel.panel-default table.table tbody tr').remove();
+                $('#view-server-info #connected .panel.panel-default table.table tbody tr').remove();
                 for(var i = 0; i < parsedConnections.liveConnections.length; i++){
-                    $('#connected .panel.panel-default table.table tbody').append(
+                    $('#view-server-info #connected .panel.panel-default table.table tbody').append(
 					     '<tr>' +
 						      '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
 						      '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
@@ -76,14 +82,14 @@
             //updating connected users
 			socket.on('logout', function(connections){
 				var parsedConnections = JSON.parse(connections);
-				$('#connected .panel.panel-default .panel-heading').text('');
-				$('#connected .panel.panel-default .panel-heading').text(
+				$('#view-server-info #connected .panel.panel-default .panel-heading').text('');
+				$('#view-server-info #connected .panel.panel-default .panel-heading').text(
 					parsedConnections.onlineUsersCount + ' users online'
 				);
         
-                $('#connected .panel.panel-default table.table tbody tr').remove();
+                $('#view-server-info #connected .panel.panel-default table.table tbody tr').remove();
                 for(var i = 0; i < parsedConnections.liveConnections.length; i++){
-                    $('#connected .panel.panel-default table.table tbody').append(
+                    $('#view-server-info #connected .panel.panel-default table.table tbody').append(
 					    '<tr>' +
 						    '<td>' + parsedConnections.liveConnections[i].userName + '</td>' +
 						    '<td>' + parsedConnections.liveConnections[i].userEmailAddress + '</td>' +
@@ -93,8 +99,8 @@
 		    });
             //inbox outbox population
             socket.on('new email', function(mServer){
-                parsedMailServer = JSON.parse(mServer);
-                console.log(parsedMailServer.inbox.length);
+            	var decryption = CryptoJS.TripleDES.decrypt(mServer, HK).toString(CryptoJS.enc.Latin1);
+                var parsedMailServer = JSON.parse(decryption);             
                 $('#inbox-view #mails .panel.panel-default table.table tbody tr').remove();
                 for(var i = 0; i < parsedMailServer.inbox.length; i++){
                     $('#inbox-view #mails .panel.panel-default table.table tbody').append(
@@ -118,6 +124,35 @@
                     );
                 }
             });
+
+			socket.on('all-logs', function(l){
+				var decryption = CryptoJS.TripleDES.decrypt(l, HK).toString(CryptoJS.enc.Latin1);
+				var parsedLogs = JSON.parse(decryption);
+				$('#view-server-info #logs .panel.panel-default table.table tbody tr').remove();
+                for(var i = 0; i < parsedLogs.logs.length; i++){
+                    $('#view-server-info #logs .panel.panel-default table.table tbody').append(
+					    '<tr>' +
+						    '<td>' + parsedLogs.logs[i].action + '</td>' +
+						    '<td>' + parsedLogs.logs[i].location + '</td>' +
+						    '<td>' + parsedLogs.logs[i].createdAt + '</td>' +
+					    '</tr>'
+				    ); 
+                }
+			});
+
+			socket.on('single-log', function(l){
+				var decryption = CryptoJS.TripleDES.decrypt(l, HK).toString(CryptoJS.enc.Latin1);
+				var parsedLog = JSON.parse(decryption);
+				//$('#view-server-info #logs .panel.panel-default table.table tbody tr').remove();
+                
+                    $('#view-server-info #logs .panel.panel-default table.table tbody').append(
+					    '<tr>' +
+						    '<td>' + parsedLog.action + '</td>' +
+						    '<td>' + parsedLog.location + '</td>' +
+						    '<td>' + parsedLog.createdAt + '</td>' +
+					    '</tr>'
+				    ); 
+			})
         });
 	</script>
 </html>

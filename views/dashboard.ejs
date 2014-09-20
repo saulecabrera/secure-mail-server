@@ -14,9 +14,7 @@
 				<li class="active"><a href="#newmail" data-toggle="tab">Compose Email</a></li>
 				<li><a href="#inbox" data-toggle="tab">Inbox</a></li>
 				<li><a href="#outbox" data-toggle="tab">Outbox</a></li>
-				<li><a href="#contacts" data-toggle="tab">Contacts</a></li>
 				<li><a href="#serverinfo" data-toggle="tab">Server Information</a></li>
-				<li><a href="#logs" data-toggle="tab">Logs</a></li>
 			</ul>
 		</center>
 			<div class="tab-content">
@@ -98,8 +96,6 @@
                       </div>
                     </div>
   				</div>
-  				<div class="tab-pane" id="contacts">
-  				</div>
   				<div class="tab-pane" id="serverinfo">
   					<div id="view-server-info" class="row">
   						<div id="connected" class="col-md-4">
@@ -122,13 +118,31 @@
   								</table>
   							</div>
   						</div>
-  						<div id="indata" class="col-md-4">
-  						</div>
-  						<div id="outdata" class="col-md-4">
+  						<div id="logs" class="col-md-8">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    Logs
+                                </div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Action
+                                            </th>
+                                            <th>
+                                                Location
+                                            </th>
+                                            <th>
+                                                Date
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
   						</div>
   					</div>
-  				</div>
-  				<div class="tab-pane" id="logs">
   				</div>
 			</div>
 	</div>
