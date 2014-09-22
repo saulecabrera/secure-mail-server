@@ -83,8 +83,8 @@ function onAuthorizeFail(data, message, error, accept) {
 var transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'scabrera92@unitec.edu',
-        pass: 'Tilica1984'
+        user: 'YOUR EMAIL',
+        pass: 'YOUR PASS'
     }
 });
 
@@ -137,7 +137,6 @@ io.on('connection', function(socket) {
 
             if (err) return handleError(err);
             logMap.logs = l;
-            logMap.logs.reverse();
             var JSONString = JSON.stringify(logMap);
             console.log("(En logs) Transferencia de todos los logs JSON");
             console.log(JSONString);
@@ -255,7 +254,7 @@ io.on('connection', function(socket) {
 
             if (mailObject.receiver.split('@')[1] != 'sms.com') {
                 var mailOptions = {
-                    from: 'Saúl Cabrera ✔ <scabrera92@unitec.edu>',
+                    from: 'YOUR NAME ✔ <YOUR EMAIL>',
                     to: mailObject.receiver,
                     subject: mailObject.subject,
                     text: mailObject.body
